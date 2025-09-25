@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AgriConnect - Smart Farming Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-page">
+    <div class="header">
+        <h1><i class="fas fa-seedling"></i> Smart Farming Dashboard</h1>
+        <p>Your AI-powered agricultural companion from planting to harvesting</p>
+    </div>
+
+    <!-- Farming Lifecycle Progress -->
+    <div class="lifecycle-section">
+        <h2><i class="fas fa-route"></i> Farming Journey Progress</h2>
+        <div class="lifecycle-progress">
+            <div class="lifecycle-step completed">
+                <i class="fas fa-seedling"></i>
+                <span>Planning & Soil Analysis</span>
+            </div>
+            <div class="lifecycle-step active">
+                <i class="fas fa-seedling"></i>
+                <span>Planting & Growth</span>
+            </div>
+            <div class="lifecycle-step">
+                <i class="fas fa-tint"></i>
+                <span>Irrigation & Care</span>
+            </div>
+            <div class="lifecycle-step">
+                <i class="fas fa-bug"></i>
+                <span>Pest Management</span>
+            </div>
+            <div class="lifecycle-step">
+                <i class="fas fa-cut"></i>
+                <span>Harvesting</span>
+            </div>
+            <div class="lifecycle-step">
+                <i class="fas fa-store"></i>
+                <span>Selling & Marketing</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fas fa-thermometer-half"></i>
+            <h3>Current Weather</h3>
+            <p id="current-temp">Loading...</p>
+            <span id="weather-condition">Loading...</span>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-chart-line"></i>
+            <h3>Market Trend</h3>
+            <p id="market-trend">Loading...</p>
+            <span id="trend-direction">Loading...</span>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Risk Alert</h3>
+            <p id="risk-level">Low</p>
+            <span id="risk-message">All systems normal</span>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-calendar-alt"></i>
+            <h3>Next Action</h3>
+            <p id="next-action">Plan irrigation</p>
+            <span id="action-date">Tomorrow</span>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <div class="dashboard-grid">
+        <a href="/crop-recommendation" class="card">
+            <div class="card-image">
+                <img src="https://images.unsplash.com/photo-1574943320219-553eb213f72d" alt="Crop Recommendation">
+            </div>
+            <h2><i class="fas fa-robot"></i> AI Crop Doctor</h2>
+            <p>Get personalized crop recommendations based on your soil, weather, and budget with ML predictions.</p>
+            <div class="card-badge">ML + AI</div>
+        </a>
+
+        <a href="/weather" class="card">
+            <div class="card-image">
+                <img src="https://images.unsplash.com/photo-1561583534-09e822ba83ba" alt="Weather Forecast">
+            </div>
+            <h2><i class="fas fa-cloud-sun"></i> Hyperlocal Weather</h2>
+            <p>Real-time weather forecasts with pest/disease alerts and farming recommendations.</p>
+            <div class="card-badge">Real-time</div>
+        </a>
+
+        <a href="/marketplace" class="card">
+            <div class="card-image">
+                <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449" alt="Marketplace">
+            </div>
+            <h2><i class="fas fa-chart-line"></i> Smart Marketplace</h2>
+            <p>AI-powered price predictions and optimal selling timing with buyer connections.</p>
+            <div class="card-badge">AI Predictions</div>
+        </a>
+
+        <div class="card" id="financial-card">
+            <div class="card-image">
+                <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c" alt="Financial Chat">
+            </div>
+            <h2><i class="fas fa-comments"></i> Financial AI Advisor</h2>
+            <p>Get personalized financial advice about loans, subsidies, and investment planning.</p>
+            <button class="button" id="openChat">Chat with AI</button>
+            <div class="card-badge">Gemini AI</div>
+        </div>
+
+        <div class="card" id="pest-card">
+            <div class="card-image">
+                <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2176" alt="Pest Management">
+            </div>
+            <h2><i class="fas fa-bug"></i> Pest & Disease Monitor</h2>
+            <p>AI-powered pest detection and organic treatment recommendations.</p>
+            <button class="button" id="checkPests">Check Crop Health</button>
+            <div class="card-badge">AI Detection</div>
+        </div>
+
+        <div class="card" id="harvest-card">
+            <div class="card-image">
+                <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854" alt="Harvest Planning">
+            </div>
+            <h2><i class="fas fa-cut"></i> Harvest Optimizer</h2>
+            <p>Get optimal harvesting timing and selling strategy based on weather and market conditions.</p>
+            <button class="button" id="planHarvest">Plan Harvest</button>
+            <div class="card-badge">Smart Timing</div>
+        </div>
+    </div>
+
+    <!-- AI Chat Modal -->
+    <div id="chatModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-robot"></i> AI Farming Advisor</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="chatMessages" class="chat-messages"></div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Ask me anything about farming...">
+                    <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pest Check Modal -->
+    <div id="pestModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-bug"></i> Crop Health Check</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="pestForm">
+                    <div class="form-group">
+                        <label for="cropName">Crop Name:</label>
+                        <input type="text" id="cropName" required placeholder="e.g., Wheat, Rice, Tomato">
+                    </div>
+                    <div class="form-group">
+                        <label for="symptoms">Symptoms (describe what you see):</label>
+                        <textarea id="symptoms" required placeholder="e.g., Yellow spots on leaves, holes in leaves, wilting..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="weatherConditions">Current Weather:</label>
+                        <input type="text" id="weatherConditions" placeholder="e.g., Hot and humid, Recent rain...">
+                    </div>
+                    <button type="submit" class="button">Get AI Diagnosis</button>
+                </form>
+                <div id="pestResults" class="results"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Harvest Planning Modal -->
+    <div id="harvestModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-cut"></i> Harvest Planning</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="harvestForm">
+                    <div class="form-group">
+                        <label for="harvestCrop">Crop Name:</label>
+                        <input type="text" id="harvestCrop" required placeholder="e.g., Wheat, Rice, Cotton">
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location:</label>
+                        <input type="text" id="location" required placeholder="e.g., Delhi, Mumbai, Bangalore">
+                    </div>
+                    <button type="submit" class="button">Get Harvest Plan</button>
+                </form>
+                <div id="harvestResults" class="results"></div>
+            </div>
+        </div>
+    </div>
+    
+    {% include 'includes/_footer.html' %}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

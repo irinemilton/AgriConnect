@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+
+{% block title %}AgriConnect - AI Crop Doctor{% endblock %}
+
+{% block bodyclass %}crop-recommendation-page{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="/dashboard" class="back-button">&larr; Back to Dashboard</a>
+    <h1><i class="fas fa-robot"></i> AI Crop Doctor</h1>
+    <div class="recommendation-banner">
+        <img src="https://images.unsplash.com/photo-1574943320219-553eb213f72d" alt="AI Crop Recommendation" class="recommendation-banner-image">
+    </div>
+    <p>Get personalized crop recommendations powered by Machine Learning and AI. Input your soil data, weather conditions, and budget to receive the best crop suggestions with yield predictions and investment analysis.</p>
+    
+    <div class="form-card">
+        <div class="form-image">
+            <img src="https://images.unsplash.com/photo-1620200423727-8127f75d6e90" alt="Soil Analysis">
+        </div>
+        <form id="cropRecommendationForm">
+            <h3><i class="fas fa-seedling"></i> Farm Information</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="location">Location:</label>
+                    <input type="text" id="location" name="location" required placeholder="e.g., Delhi, Mumbai, Bangalore">
+                </div>
+                
+                <div class="form-group">
+                    <label for="landSize">Land Size (acres):</label>
+                    <input type="number" id="landSize" name="landSize" required min="0.1" step="0.1" placeholder="e.g., 2.5">
+                </div>
+            </div>
+
+            <h3><i class="fas fa-vial"></i> Soil Analysis</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="soilType">Soil Type:</label>
+                    <select id="soilType" name="soilType" required>
+                        <option value="">Select Soil Type</option>
+                        <option value="loamy">Loamy (Best for most crops)</option>
+                        <option value="clay">Clay (Heavy, good water retention)</option>
+                        <option value="sandy">Sandy (Well-draining, needs more water)</option>
+                        <option value="silty">Silty (Fertile, good for vegetables)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="soilPh">Soil pH Level:</label>
+                    <input type="number" id="soilPh" name="soilPh" required min="4" max="9" step="0.1" placeholder="6.5 (neutral)">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nitrogen">Nitrogen Content (ppm):</label>
+                    <input type="number" id="nitrogen" name="nitrogen" required min="0" placeholder="50">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phosphorus">Phosphorus Content (ppm):</label>
+                    <input type="number" id="phosphorus" name="phosphorus" required min="0" placeholder="30">
+                </div>
+                
+                <div class="form-group">
+                    <label for="potassium">Potassium Content (ppm):</label>
+                    <input type="number" id="potassium" name="potassium" required min="0" placeholder="40">
+                </div>
+            </div>
+
+            <h3><i class="fas fa-cloud-sun"></i> Climate Information</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="rainfall">Annual Rainfall (mm):</label>
+                    <input type="number" id="rainfall" name="rainfall" required min="0" placeholder="800">
+                </div>
+                
+                <div class="form-group">
+                    <label for="temperature">Average Temperature (°C):</label>
+                    <input type="number" id="temperature" name="temperature" required min="-10" max="50" placeholder="28">
+                </div>
+                
+                <div class="form-group">
+                    <label for="humidity">Average Humidity (%):</label>
+                    <input type="number" id="humidity" name="humidity" required min="0" max="100" placeholder="70">
+                </div>
+            </div>
+
+            <h3><i class="fas fa-rupee-sign"></i> Investment & Resources</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="budget">Available Budget (₹):</label>
+                    <input type="number" id="budget" name="budget" required min="10000" placeholder="50000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="irrigation">Irrigation Available:</label>
+                    <select id="irrigation" name="irrigation" required>
+                        <option value="">Select Irrigation Type</option>
+                        <option value="drip">Drip Irrigation (Efficient)</option>
+                        <option value="sprinkler">Sprinkler System</option>
+                        <option value="flood">Flood Irrigation</option>
+                        <option value="rainfed">Rainfed Only</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="experience">Farming Experience:</label>
+                <select id="experience" name="experience" required>
+                    <option value="">Select Experience Level</option>
+                    <option value="beginner">Beginner (0-2 years)</option>
+                    <option value="intermediate">Intermediate (3-10 years)</option>
+                    <option value="expert">Expert (10+ years)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="button" id="submitBtn">
+                <i class="fas fa-magic"></i> Get AI Recommendation
+            </button>
+        </form>
+    </div>
+    
+    <!-- Results Section -->
+    <div id="results" class="results-section" style="display: none;">
+        <h2><i class="fas fa-chart-line"></i> AI Analysis Results</h2>
+        
+        <!-- ML Recommendations -->
+        <div class="ml-results">
+            <h3><i class="fas fa-brain"></i> Machine Learning Predictions</h3>
+            <div id="mlRecommendations" class="recommendations-grid"></div>
+        </div>
+        
+        <!-- AI Advice -->
+        <div class="ai-advice">
+            <h3><i class="fas fa-robot"></i> AI Expert Advice</h3>
+            <div id="aiAdvice" class="ai-response"></div>
+        </div>
+        
+        <!-- Weather Context -->
+        <div class="weather-context">
+            <h3><i class="fas fa-cloud-sun"></i> Weather Context</h3>
+            <div id="weatherContext" class="weather-info"></div>
+        </div>
+        
+        <!-- Action Plan -->
+        <div class="action-plan">
+            <h3><i class="fas fa-tasks"></i> Recommended Action Plan</h3>
+            <div id="actionPlan" class="action-steps"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('cropRecommendationForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const resultsSection = document.getElementById('results');
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+    submitBtn.disabled = true;
+    
+    // Collect form data
+    const formData = {
+        location: document.getElementById('location').value,
+        soil_data: {
+            soil_type: document.getElementById('soilType').value,
+            soil_ph: parseFloat(document.getElementById('soilPh').value),
+            nitrogen: parseFloat(document.getElementById('nitrogen').value),
+            phosphorus: parseFloat(document.getElementById('phosphorus').value),
+            potassium: parseFloat(document.getElementById('potassium').value),
+            rainfall: parseFloat(document.getElementById('rainfall').value),
+            temperature: parseFloat(document.getElementById('temperature').value),
+            humidity: parseFloat(document.getElementById('humidity').value),
+            land_size: parseFloat(document.getElementById('landSize').value)
+        },
+        budget: parseFloat(document.getElementById('budget').value),
+        irrigation: document.getElementById('irrigation').value,
+        experience: document.getElementById('experience').value
+    };
+    
+    try {
+        const response = await fetch('/api/crop-recommendation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            displayResults(data);
+            resultsSection.style.display = 'block';
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            throw new Error(data.error || 'Failed to get recommendations');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Sorry, we encountered an error. Please try again.');
+    } finally {
+        submitBtn.innerHTML = '<i class="fas fa-magic"></i> Get AI Recommendation';
+        submitBtn.disabled = false;
+    }
+});
+
+function displayResults(data) {
+    // Display ML recommendations
+    const mlRecs = document.getElementById('mlRecommendations');
+    if (data.ml_recommendations && data.ml_recommendations.recommendations) {
+        mlRecs.innerHTML = data.ml_recommendations.recommendations.map((rec, index) => `
+            <div class="recommendation-card ${index === 0 ? 'best' : ''}">
+                <div class="crop-rank">#${index + 1}</div>
+                <h4>${rec.crop.charAt(0).toUpperCase() + rec.crop.slice(1)}</h4>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: ${rec.confidence * 100}%"></div>
+                    <span class="confidence-text">${Math.round(rec.confidence * 100)}% confidence</span>
+                </div>
+                <div class="crop-details">
+                    <p><strong>Estimated Yield:</strong> ${rec.estimated_yield}</p>
+                    <p><strong>Required Investment:</strong> ${rec.required_investment}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // Display AI advice
+    const aiAdvice = document.getElementById('aiAdvice');
+    aiAdvice.innerHTML = `<div class="ai-text">${data.ai_advice}</div>`;
+    
+    // Display weather context
+    const weatherContext = document.getElementById('weatherContext');
+    if (data.weather_context) {
+        const weather = data.weather_context;
+        weatherContext.innerHTML = `
+            <div class="weather-summary">
+                <div class="weather-item">
+                    <i class="fas fa-thermometer-half"></i>
+                    <span>Temperature: ${weather.current?.temp_c || 'N/A'}°C</span>
+                </div>
+                <div class="weather-item">
+                    <i class="fas fa-cloud"></i>
+                    <span>Condition: ${weather.current?.condition?.text || 'N/A'}</span>
+                </div>
+                <div class="weather-item">
+                    <i class="fas fa-tint"></i>
+                    <span>Humidity: ${weather.current?.humidity || 'N/A'}%</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Generate action plan
+    const actionPlan = document.getElementById('actionPlan');
+    actionPlan.innerHTML = `
+        <div class="action-steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h4>Soil Preparation</h4>
+                    <p>Prepare your soil based on the crop requirements and current soil analysis.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h4>Seed Selection & Planting</h4>
+                    <p>Choose high-quality seeds and plant according to the recommended schedule.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h4>Monitoring & Care</h4>
+                    <p>Monitor crop growth and apply necessary treatments based on AI recommendations.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h4>Harvest Planning</h4>
+                    <p>Plan your harvest timing based on market conditions and weather forecasts.</p>
+                </div>
+            </div>
+        </div>
+    `;
+}
+</script>
+{% endblock %}

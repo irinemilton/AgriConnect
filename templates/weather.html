@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}AgriConnect - Weather Forecast{% endblock %}
+
+{% block bodyclass %}weather-page{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="/dashboard" class="back-button">&larr; Back to Dashboard</a>
+    <h1>Localized Weather Forecast</h1>
+    <div class="weather-banner">
+        <img src="https://images.unsplash.com/photo-1561583534-09e822ba83ba" alt="Weather Field" class="weather-banner-image">
+    </div>
+    <div class="weather-card">
+        <div class="weather-icon">
+            <img src="https://images.unsplash.com/photo-1592210454359-9043f067919b" alt="Weather Condition">
+        </div>
+        <div class="weather-info">
+            <p><strong>Location:</strong> {{ weather.location }}</p>
+            <p><strong>Temperature:</strong> {{ weather.temperature }}</p>
+            <p><strong>Condition:</strong> {{ weather.condition }}</p>
+        </div>
+        <div class="weather-alerts">
+            <h3>⚠️ Risk Alerts</h3>
+            <p class="alert-message">No immediate alerts. The conditions are favorable for farming.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

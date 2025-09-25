@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}AgriConnect{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="/dashboard">
+                    <i class="fas fa-seedling"></i>
+                    <span>AgriConnect</span>
+                </a>
+            </div>
+            
+            <div class="nav-menu" id="navMenu">
+                <a href="/dashboard" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/farming-journey" class="nav-link">
+                    <i class="fas fa-route"></i>
+                    <span>My Journey</span>
+                </a>
+                <a href="/crop-recommendation" class="nav-link">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Crop Doctor</span>
+                </a>
+                <a href="/weather" class="nav-link">
+                    <i class="fas fa-cloud-sun"></i>
+                    <span>Weather</span>
+                </a>
+                <a href="/marketplace" class="nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Marketplace</span>
+                </a>
+                
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-btn" id="notificationsBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                    </button>
+                    <div class="nav-dropdown-content" id="notificationsDropdown">
+                        <div class="dropdown-header">
+                            <h3>Notifications</h3>
+                            <button id="markAllRead" class="btn-small">Mark All Read</button>
+                        </div>
+                        <div class="notifications-list" id="notificationsList">
+                            <div class="no-notifications">No new notifications</div>
+                        </div>
+                        <div class="dropdown-footer">
+                            <a href="/notifications">View All Notifications</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-btn" id="chatBtn">
+                        <i class="fas fa-comments"></i>
+                    </button>
+                    <div class="nav-dropdown-content chat-dropdown" id="chatDropdown">
+                        <div class="dropdown-header">
+                            <h3>AI Assistant</h3>
+                        </div>
+                        <div class="chat-container">
+                            <div class="chat-messages" id="quickChatMessages"></div>
+                            <div class="chat-input">
+                                <input type="text" id="quickChatInput" placeholder="Ask me anything...">
+                                <button id="quickSendMessage"><i class="fas fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                        <div class="dropdown-footer">
+                            <a href="/chat">Open Full Chat</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-btn" id="profileBtn">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userName">User</span>
+                    </button>
+                    <div class="nav-dropdown-content" id="profileDropdown">
+                        <div class="dropdown-header">
+                            <h3 id="profileUserName">User Profile</h3>
+                        </div>
+                        <a href="/profile" class="dropdown-item">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </a>
+                        <a href="/settings" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="/help" class="dropdown-item">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Help</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="/logout" class="dropdown-item logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-toggle" id="navToggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% include 'includes/_footer.html' %}
+
+    <script>
+        // Navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle mobile menu
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.getElementById('navMenu');
+            
+            if (navToggle) {
+                navToggle.addEventListener('click', function() {
+                    navMenu.classList.toggle('active');
+                });
+            }
+            
+            // Dropdown functionality
+            const dropdowns = document.querySelectorAll('.nav-dropdown');
+            dropdowns.forEach(dropdown => {
+                const btn = dropdown.querySelector('.nav-dropdown-btn');
+                const content = dropdown.querySelector('.nav-dropdown-content');
+                
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Close other dropdowns
+                    dropdowns.forEach(otherDropdown => {
+                        if (otherDropdown !== dropdown) {
+                            otherDropdown.querySelector('.nav-dropdown-content').classList.remove('show');
+                        }
+                    });
+                    
+                    // Toggle current dropdown
+                    content.classList.toggle('show');
+                });
+            });
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function() {
+                dropdowns.forEach(dropdown => {
+                    dropdown.querySelector('.nav-dropdown-content').classList.remove('show');
+                });
+            });
+            
+            // Load user data
+            loadUserData();
+            loadNotifications();
+            
+            // Quick chat functionality
+            setupQuickChat();
+        });
+        
+        function loadUserData() {
+            fetch('/api/user/profile')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('userName').textContent = data.user.full_name || data.user.username;
+                    document.getElementById('profileUserName').textContent = data.user.full_name || data.user.username;
+                }
+            })
+            .catch(error => console.error('Error loading user data:', error));
+        }
+        
+        function loadNotifications() {
+            fetch('/api/notifications')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateNotificationBadge(data.unread_count || 0);
+                    updateNotificationsList(data.notifications || []);
+                }
+            })
+            .catch(error => console.error('Error loading notifications:', error));
+        }
+        
+        function updateNotificationBadge(count) {
+            const badge = document.getElementById('notificationBadge');
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        
+        function updateNotificationsList(notifications) {
+            const container = document.getElementById('notificationsList');
+            if (notifications.length === 0) {
+                container.innerHTML = '<div class="no-notifications">No new notifications</div>';
+                return;
+            }
+            
+            container.innerHTML = notifications.slice(0, 5).map(notif => `
+                <div class="notification-item ${notif.is_read ? 'read' : 'unread'}" data-id="${notif.id}">
+                    <div class="notification-icon">
+                        <i class="fas fa-${getNotificationIcon(notif.notification_type)}"></i>
+                    </div>
+                    <div class="notification-content">
+                        <h4>${notif.title}</h4>
+                        <p>${notif.message}</p>
+                        <span class="notification-time">${formatTime(notif.created_at)}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getNotificationIcon(type) {
+            const icons = {
+                'weather': 'cloud-rain',
+                'market': 'chart-line',
+                'reminder': 'bell',
+                'alert': 'exclamation-triangle',
+                'welcome': 'hand-wave',
+                'plan_created': 'seedling'
+            };
+            return icons[type] || 'bell';
+        }
+        
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'Just now';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+            return date.toLocaleDateString();
+        }
+        
+        function setupQuickChat() {
+            const quickChatInput = document.getElementById('quickChatInput');
+            const quickSendBtn = document.getElementById('quickSendMessage');
+            const quickChatMessages = document.getElementById('quickChatMessages');
+            
+            function sendQuickMessage() {
+                const message = quickChatInput.value.trim();
+                if (!message) return;
+                
+                // Add user message
+                addQuickChatMessage(message, 'user');
+                quickChatInput.value = '';
+                
+                // Send to AI
+                fetch('/api/financial-advice', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: message, financial_data: {} })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        addQuickChatMessage(data.advice, 'ai');
+                    } else {
+                        addQuickChatMessage('Sorry, I encountered an error.', 'ai');
+                    }
+                })
+                .catch(error => {
+                    addQuickChatMessage('Sorry, I\'m having trouble connecting.', 'ai');
+                });
+            }
+            
+            if (quickSendBtn) {
+                quickSendBtn.addEventListener('click', sendQuickMessage);
+            }
+            
+            if (quickChatInput) {
+                quickChatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendQuickMessage();
+                    }
+                });
+            }
+        }
+        
+        function addQuickChatMessage(message, sender) {
+            const quickChatMessages = document.getElementById('quickChatMessages');
+            if (!quickChatMessages) return;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}`;
+            messageDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'AI'}:</strong> ${message}`;
+            
+            quickChatMessages.appendChild(messageDiv);
+            quickChatMessages.scrollTop = quickChatMessages.scrollHeight;
+        }
+    </script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

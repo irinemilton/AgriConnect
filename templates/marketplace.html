@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}AgriConnect - Marketplace{% endblock %}
+
+{% block bodyclass %}marketplace-page{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="/dashboard" class="back-button">&larr; Back to Dashboard</a>
+    <h1>Digital Marketplace</h1>
+    <p>Connect with buyers and see live market prices for your crops.</p>
+    <div class="marketplace-banner">
+        <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449" alt="Fresh Produce" class="banner-image">
+    </div>
+    <div class="market-list">
+        {% for market in markets %}
+            <div class="market-item">
+                <div class="market-item-image">
+                    <img src="https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04" alt="{{ market.crop }}" class="crop-image">
+                </div>
+                <div class="market-item-content">
+                    <h3>{{ market.crop }}</h3>
+                    <p>Current Price: {{ market.price }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

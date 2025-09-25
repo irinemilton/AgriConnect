@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AgriConnect - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="home-page">
+    <div class="container">
+        <div class="hero-section">
+            <img src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2" alt="Farm Field" class="hero-image">
+            <h1>Welcome to AgriConnect</h1>
+            <p>Your integrated, AI-powered platform to empower farmers with data-driven insights.</p>
+            <a href="/login" class="button">Get Started - Login</a>
+        </div>
+    </div>
+    {% include 'includes/_footer.html' %}
+</body>
+</html>

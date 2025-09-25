@@ -1,0 +1,591 @@
+{% extends "base.html" %}
+
+{% block title %}Farming Journey - AgriConnect{% endblock %}
+
+{% block bodyclass %}farming-journey-page{% endblock %}
+
+{% block extra_head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-seedling"></i> Your Complete Farming Journey</h1>
+            <p>From planning to harvesting - AI-powered guidance every step of the way</p>
+        </div>
+
+        <!-- Initial Setup Form -->
+        <div id="setupForm" class="setup-section">
+            <div class="form-card">
+                <h2><i class="fas fa-user-plus"></i> Start Your Farming Journey</h2>
+                <p>Tell us about your farm and we'll guide you through the entire farming process with AI-powered recommendations, weather alerts, and market insights.</p>
+                
+                <form id="farmingJourneyForm">
+                    <div class="form-section">
+                        <h3><i class="fas fa-map-marker-alt"></i> Farm Location & Size</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="location">Location:</label>
+                                <input type="text" id="location" name="location" required placeholder="e.g., Delhi, Mumbai, Bangalore">
+                            </div>
+                            <div class="form-group">
+                                <label for="landSize">Land Size (acres):</label>
+                                <input type="number" id="landSize" name="landSize" required min="0.1" step="0.1" placeholder="e.g., 2.5">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-vial"></i> Soil Analysis</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="soilType">Soil Type:</label>
+                                <select id="soilType" name="soilType" required>
+                                    <option value="">Select Soil Type</option>
+                                    <option value="loamy">Loamy (Best for most crops)</option>
+                                    <option value="clay">Clay (Heavy, good water retention)</option>
+                                    <option value="sandy">Sandy (Well-draining, needs more water)</option>
+                                    <option value="silty">Silty (Fertile, good for vegetables)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="soilPh">Soil pH Level:</label>
+                                <input type="number" id="soilPh" name="soilPh" required min="4" max="9" step="0.1" placeholder="6.5 (neutral)">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nitrogen">Nitrogen Content (ppm):</label>
+                                <input type="number" id="nitrogen" name="nitrogen" required min="0" placeholder="50">
+                            </div>
+                            <div class="form-group">
+                                <label for="phosphorus">Phosphorus Content (ppm):</label>
+                                <input type="number" id="phosphorus" name="phosphorus" required min="0" placeholder="30">
+                            </div>
+                            <div class="form-group">
+                                <label for="potassium">Potassium Content (ppm):</label>
+                                <input type="number" id="potassium" name="potassium" required min="0" placeholder="40">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-cloud-sun"></i> Climate & Resources</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="rainfall">Annual Rainfall (mm):</label>
+                                <input type="number" id="rainfall" name="rainfall" required min="0" placeholder="800">
+                            </div>
+                            <div class="form-group">
+                                <label for="temperature">Average Temperature (°C):</label>
+                                <input type="number" id="temperature" name="temperature" required min="-10" max="50" placeholder="28">
+                            </div>
+                            <div class="form-group">
+                                <label for="humidity">Average Humidity (%):</label>
+                                <input type="number" id="humidity" name="humidity" required min="0" max="100" placeholder="70">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="irrigation">Irrigation Available:</label>
+                                <select id="irrigation" name="irrigation" required>
+                                    <option value="">Select Irrigation Type</option>
+                                    <option value="drip">Drip Irrigation (Efficient)</option>
+                                    <option value="sprinkler">Sprinkler System</option>
+                                    <option value="flood">Flood Irrigation</option>
+                                    <option value="rainfed">Rainfed Only</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="budget">Available Budget (₹):</label>
+                                <input type="number" id="budget" name="budget" required min="10000" placeholder="50000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-user-tie"></i> Experience & Goals</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="experience">Farming Experience:</label>
+                                <select id="experience" name="experience" required>
+                                    <option value="">Select Experience Level</option>
+                                    <option value="beginner">Beginner (0-2 years)</option>
+                                    <option value="intermediate">Intermediate (3-10 years)</option>
+                                    <option value="expert">Expert (10+ years)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="goal">Primary Goal:</label>
+                                <select id="goal" name="goal" required>
+                                    <option value="">Select Primary Goal</option>
+                                    <option value="profit">Maximum Profit</option>
+                                    <option value="sustainability">Sustainable Farming</option>
+                                    <option value="quality">High Quality Produce</option>
+                                    <option value="learning">Learning & Experimentation</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="button start-journey-btn">
+                        <i class="fas fa-rocket"></i> Start My AI-Powered Farming Journey
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Farming Dashboard -->
+        <div id="farmingDashboard" class="dashboard-section" style="display: none;">
+            <!-- Journey Progress -->
+            <div class="journey-progress">
+                <h2><i class="fas fa-route"></i> Your Farming Journey Progress</h2>
+                <div class="progress-timeline" id="progressTimeline">
+                    <!-- Timeline will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-thermometer-half"></i>
+                    <h3>Current Weather</h3>
+                    <p id="currentTemp">Loading...</p>
+                    <span id="weatherCondition">Loading...</span>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Market Price</h3>
+                    <p id="marketPrice">Loading...</p>
+                    <span id="priceTrend">Loading...</span>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-seedling"></i>
+                    <h3>Crop Health</h3>
+                    <p id="cropHealth">Loading...</p>
+                    <span id="healthStatus">Loading...</span>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h3>Next Activity</h3>
+                    <p id="nextActivity">Loading...</p>
+                    <span id="activityDate">Loading...</span>
+                </div>
+            </div>
+
+            <!-- Alerts and Reminders -->
+            <div class="alerts-section">
+                <h2><i class="fas fa-exclamation-triangle"></i> Important Alerts & Reminders</h2>
+                <div id="alertsContainer" class="alerts-container">
+                    <!-- Alerts will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Current Phase Activities -->
+            <div class="current-phase">
+                <h2><i class="fas fa-tasks"></i> Current Phase: <span id="currentPhaseName">Planning</span></h2>
+                <div id="currentActivities" class="activities-grid">
+                    <!-- Activities will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Financial Summary -->
+            <div class="financial-summary">
+                <h2><i class="fas fa-rupee-sign"></i> Financial Overview</h2>
+                <div class="financial-grid">
+                    <div class="financial-card">
+                        <h4>Total Budget</h4>
+                        <p id="totalBudget">₹0</p>
+                    </div>
+                    <div class="financial-card">
+                        <h4>Estimated Yield</h4>
+                        <p id="estimatedYield">0 tons</p>
+                    </div>
+                    <div class="financial-card">
+                        <h4>Expected Income</h4>
+                        <p id="expectedIncome">₹0</p>
+                    </div>
+                    <div class="financial-card">
+                        <h4>ROI</h4>
+                        <p id="roiPercentage">0%</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Chat Assistant -->
+            <div class="ai-assistant">
+                <h2><i class="fas fa-robot"></i> AI Farming Assistant</h2>
+                <div class="chat-container">
+                    <div id="chatMessages" class="chat-messages"></div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Ask your AI farming assistant anything...">
+                        <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Update -->
+            <div class="progress-update">
+                <h2><i class="fas fa-edit"></i> Update Your Progress</h2>
+                <form id="progressUpdateForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="completedActivity">Completed Activity:</label>
+                            <input type="text" id="completedActivity" name="completedActivity" placeholder="e.g., Soil preparation completed">
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">Notes:</label>
+                            <textarea id="notes" name="notes" placeholder="Any observations or issues..."></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="button">
+                        <i class="fas fa-save"></i> Update Progress
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPlanId = null;
+        let dashboardData = null;
+
+        // Initialize the farming journey
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            loadExistingPlan(); // Check if there's an existing plan
+        });
+
+        function setupEventListeners() {
+            document.getElementById('farmingJourneyForm').addEventListener('submit', startFarmingJourney);
+            document.getElementById('progressUpdateForm').addEventListener('submit', updateProgress);
+            document.getElementById('sendMessage').addEventListener('click', sendChatMessage);
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+        }
+
+        function loadExistingPlan() {
+            // Check localStorage for existing plan
+            const savedPlanId = localStorage.getItem('farmingPlanId');
+            if (savedPlanId) {
+                loadFarmingDashboard(savedPlanId);
+            }
+        }
+
+        async function startFarmingJourney(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.querySelector('.start-journey-btn');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Your Farming Plan...';
+            submitBtn.disabled = true;
+            
+            // Collect form data
+            const formData = {
+                location: document.getElementById('location').value,
+                soil_data: {
+                    soil_type: document.getElementById('soilType').value,
+                    soil_ph: parseFloat(document.getElementById('soilPh').value),
+                    nitrogen: parseFloat(document.getElementById('nitrogen').value),
+                    phosphorus: parseFloat(document.getElementById('phosphorus').value),
+                    potassium: parseFloat(document.getElementById('potassium').value),
+                    rainfall: parseFloat(document.getElementById('rainfall').value),
+                    temperature: parseFloat(document.getElementById('temperature').value),
+                    humidity: parseFloat(document.getElementById('humidity').value),
+                    land_size: parseFloat(document.getElementById('landSize').value)
+                },
+                budget: parseFloat(document.getElementById('budget').value),
+                irrigation: document.getElementById('irrigation').value,
+                experience: document.getElementById('experience').value,
+                goal: document.getElementById('goal').value
+            };
+            
+            try {
+                const response = await fetch('/api/start-farming-journey', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentPlanId = data.plan_id;
+                    localStorage.setItem('farmingPlanId', currentPlanId);
+                    loadFarmingDashboard(currentPlanId);
+                } else {
+                    throw new Error(data.error || 'Failed to create farming plan');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Sorry, we encountered an error. Please try again.');
+            } finally {
+                submitBtn.innerHTML = '<i class="fas fa-rocket"></i> Start My AI-Powered Farming Journey';
+                submitBtn.disabled = false;
+            }
+        }
+
+        async function loadFarmingDashboard(planId) {
+            try {
+                const response = await fetch(`/api/farming-dashboard/${planId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    dashboardData = data.dashboard;
+                    displayFarmingDashboard();
+                } else {
+                    throw new Error(data.error || 'Failed to load dashboard');
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                alert('Failed to load your farming dashboard. Please try again.');
+            }
+        }
+
+        function displayFarmingDashboard() {
+            // Hide setup form and show dashboard
+            document.getElementById('setupForm').style.display = 'none';
+            document.getElementById('farmingDashboard').style.display = 'block';
+            
+            // Update all dashboard elements
+            updateProgressTimeline();
+            updateStats();
+            updateAlerts();
+            updateCurrentPhase();
+            updateFinancialSummary();
+            
+            // Add welcome message to chat
+            addChatMessage("Welcome to your AI-powered farming journey! I'm here to help you every step of the way. How can I assist you today?", 'ai');
+        }
+
+        function updateProgressTimeline() {
+            const timeline = dashboardData.timeline;
+            const currentPhase = dashboardData.current_phase;
+            
+            let timelineHTML = '';
+            for (let i = 0; i < timeline.weeks.length; i++) {
+                const week = timeline.weeks[i];
+                const isActive = week.phase === currentPhase;
+                const isCompleted = i < timeline.weeks.findIndex(w => w.phase === currentPhase);
+                
+                timelineHTML += `
+                    <div class="timeline-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}">
+                        <div class="timeline-marker">
+                            <i class="fas fa-${getPhaseIcon(week.phase)}"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h4>${week.phase}</h4>
+                            <p>Week ${week.week} • ${week.duration}</p>
+                            <div class="timeline-activities">
+                                ${week.activities.map(activity => `<span class="activity-tag">${activity}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('progressTimeline').innerHTML = timelineHTML;
+        }
+
+        function updateStats() {
+            // Weather
+            const weather = dashboardData.current_weather;
+            if (weather && weather.current) {
+                document.getElementById('currentTemp').textContent = `${weather.current.temp_c}°C`;
+                document.getElementById('weatherCondition').textContent = weather.current.condition.text;
+            }
+            
+            // Market
+            const market = dashboardData.current_market;
+            if (market && market.data && market.data.length > 0) {
+                const price = market.data[0].price;
+                const change = market.data[0].change_percent || 0;
+                document.getElementById('marketPrice').textContent = `₹${price}/qtl`;
+                document.getElementById('priceTrend').textContent = `${change > 0 ? '+' : ''}${change}%`;
+                document.getElementById('priceTrend').style.color = change > 0 ? '#4CAF50' : change < 0 ? '#f44336' : '#666';
+            }
+            
+            // Crop Health
+            const health = dashboardData.crop_health_score;
+            if (health) {
+                document.getElementById('cropHealth').textContent = health.score + '%';
+                document.getElementById('healthStatus').textContent = health.status;
+            }
+            
+            // Next Activity
+            const nextActivities = dashboardData.next_activities;
+            if (nextActivities && nextActivities.length > 0) {
+                document.getElementById('nextActivity').textContent = nextActivities[0];
+                document.getElementById('activityDate').textContent = 'This week';
+            }
+        }
+
+        function updateAlerts() {
+            const alerts = dashboardData.active_alerts || [];
+            const reminders = dashboardData.active_reminders || [];
+            
+            let alertsHTML = '';
+            
+            [...alerts, ...reminders].forEach(alert => {
+                const priorityClass = alert.priority || 'medium';
+                alertsHTML += `
+                    <div class="alert-item ${priorityClass}">
+                        <i class="fas fa-${getAlertIcon(alert.type)}"></i>
+                        <div class="alert-content">
+                            <h4>${alert.message}</h4>
+                            <p>${alert.date || 'Today'}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            if (alertsHTML === '') {
+                alertsHTML = '<div class="no-alerts">No active alerts. Everything looks good!</div>';
+            }
+            
+            document.getElementById('alertsContainer').innerHTML = alertsHTML;
+        }
+
+        function updateCurrentPhase() {
+            document.getElementById('currentPhaseName').textContent = dashboardData.current_phase;
+            
+            const nextActivities = dashboardData.next_activities || [];
+            let activitiesHTML = '';
+            
+            nextActivities.forEach(activity => {
+                activitiesHTML += `
+                    <div class="activity-card">
+                        <i class="fas fa-check-circle"></i>
+                        <h4>${activity}</h4>
+                        <p>Complete this activity to progress to the next phase</p>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('currentActivities').innerHTML = activitiesHTML;
+        }
+
+        function updateFinancialSummary() {
+            const financial = dashboardData.financial_summary;
+            if (financial) {
+                document.getElementById('totalBudget').textContent = `₹${financial.total_budget}`;
+                document.getElementById('estimatedYield').textContent = financial.estimated_yield;
+                document.getElementById('expectedIncome').textContent = financial.estimated_income;
+                document.getElementById('roiPercentage').textContent = `${financial.roi_percentage}%`;
+            }
+        }
+
+        async function updateProgress(e) {
+            e.preventDefault();
+            
+            const completedActivity = document.getElementById('completedActivity').value;
+            const notes = document.getElementById('notes').value;
+            
+            if (!completedActivity) {
+                alert('Please enter the completed activity.');
+                return;
+            }
+            
+            const progressUpdate = {
+                activity: completedActivity,
+                notes: notes,
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                const response = await fetch(`/api/update-progress/${currentPlanId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(progressUpdate)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Progress updated successfully!');
+                    document.getElementById('progressUpdateForm').reset();
+                    loadFarmingDashboard(currentPlanId); // Refresh dashboard
+                } else {
+                    throw new Error(data.error || 'Failed to update progress');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to update progress. Please try again.');
+            }
+        }
+
+        async function sendChatMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            
+            if (!message) return;
+            
+            addChatMessage(message, 'user');
+            chatInput.value = '';
+            
+            try {
+                const response = await fetch('/api/financial-advice', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        query: message, 
+                        financial_data: dashboardData.financial_summary || {}
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addChatMessage(data.advice, 'ai');
+                } else {
+                    addChatMessage('Sorry, I encountered an error. Please try again.', 'ai');
+                }
+            } catch (error) {
+                addChatMessage('Sorry, I\'m having trouble connecting.', 'ai');
+                console.error('Chat error:', error);
+            }
+        }
+
+        function addChatMessage(message, sender) {
+            const chatMessages = document.getElementById('chatMessages');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}`;
+            messageDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'AI Assistant'}:</strong> ${message}`;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Utility functions
+        function getPhaseIcon(phase) {
+            const icons = {
+                'Soil Preparation': 'tractor',
+                'Planting': 'seedling',
+                'Growth Monitoring': 'eye',
+                'Active Growth': 'chart-line',
+                'Pre-Harvest': 'clock',
+                'Harvesting': 'cut',
+                'Post-Harvest': 'warehouse'
+            };
+            return icons[phase] || 'circle';
+        }
+
+        function getAlertIcon(type) {
+            const icons = {
+                'rain_alert': 'cloud-rain',
+                'market_alert': 'chart-line',
+                'activity_reminder': 'bell',
+                'pest_alert': 'bug'
+            };
+            return icons[type] || 'exclamation';
+        }
+    </script>
+{% endblock %}
